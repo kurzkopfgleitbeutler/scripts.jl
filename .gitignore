@@ -1,0 +1,18 @@
+# http://stackoverflow.com/a/987162/3553458
+# Ignore everything
+
+*
+
+# But not these files...
+
+!.gitignore
+!README.md
+!LICENSE
+
+!install.jl
+
+!*.jl
+
+# ...even if they are in subdirectories
+
+!*/
