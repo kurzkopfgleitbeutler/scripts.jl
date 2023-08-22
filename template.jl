@@ -30,6 +30,9 @@ end
 
 # state = init(getflags([...]))
 state = init()
+
+# functions...
+
 function main()
 
 
