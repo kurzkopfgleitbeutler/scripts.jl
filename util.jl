@@ -5,6 +5,7 @@ using Dates
 
 name = nameof(@__MODULE__)
 
+juliapackages::Vector{String} = ["LoggingExtras"]
 dependencies::Vector{String} = []
 optionals::Vector{String} = []
 
@@ -78,6 +79,27 @@ function init(flags)
   end
 
   return state
+end
+
+function checkjuliapackages(deps)
+  pkgs = Pkg.project().dependencies
+  for dep in deps
+    if haskey(pkgs, dep)
+      @info string("Has package ", dep)
+    else
+      @warn string("Missing package ", dep)
+    end
+  end
+end
+
+function checkdependencies(deps)
+  for dep in deps
+    if isnothing(Sys.which(dep))
+      @warn string("Missing ", dep)
+    else
+      @info string("Has ", dep)
+    end
+  end
 end
 
 function statistics()
