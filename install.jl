@@ -12,7 +12,7 @@ $name [file names]
 """ name
 
 prefix = "/usr/local/bin/"
-apps = []
+apps = ["gib.jl", "mkpdf.jl", "sfh.jl"]
 
 util = joinpath(prefix, "util.jl")
 command = `sudo install -o root -g root -m 0755 -v util.jl $util`
