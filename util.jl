@@ -23,35 +23,12 @@ function getflags()
     )]
 end
 
-function getflags(behaviour)
+function getflags(behaviour::Tuple{Vector{String},Expr})
+  return getflags([behaviour])
+end
+
+function getflags(behaviour::Vector{Tuple{Vector{String},Expr}})
   return append!(getflags(), behaviour)
-end
-
-function checkdependencies(deps::Vector{String})
-  for dep in deps
-    if isnothing(Sys.which(dep))
-      @warn string("Missing ", dep)
-    else
-      @info string("Has ", dep)
-    end
-  end
-end
-
-function getflagparse(behaviour::Vector{Tuple{Vector{String},Expr}})::Function
-  flagparse = function (state)
-    for (flagvector, action) in behaviour
-      if !isempty(ARGS)
-        if ARGS[1] in flagvector
-          @debug string("got flag ", ARGS[1], " do action: ", action)
-          popfirst!(ARGS)
-          eval(action)
-          flagparse(state)
-        end
-      end
-    end
-    return state
-  end
-  return flagparse
 end
 
 function init()
@@ -79,6 +56,23 @@ function init(flags)
   end
 
   return state
+end
+
+function getflagparse(behaviour::Vector{Tuple{Vector{String},Expr}})
+  flagparse = function (state)
+    for (flagvector, action) in behaviour
+      if !isempty(ARGS)
+        if ARGS[1] in flagvector
+          @debug string("got flag ", ARGS[1], " do action: ", action)
+          popfirst!(ARGS)
+          eval(action)
+          flagparse(state)
+        end
+      end
+    end
+    return state
+  end
+  return flagparse
 end
 
 function checkjuliapackages(deps)
