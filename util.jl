@@ -113,5 +113,5 @@ function statistics()
     touch(file)
     write(file, string(name, " ", counter, "\r\n"))
   end
-  @info string(ENV["USER"], " running ", name, " for the ", counter, " time")
+  @info string(ENV["USER"], " running ", name, " for the ", counter, "th time")
 end
