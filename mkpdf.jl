@@ -18,6 +18,8 @@ $name - create PDF from PNG images
 $name [OPTIONS] [DIR | IMGS]
 
 # Known Limitations
+
+- PDFs generated with an OCR layer aren't sized down, which quadruples file size
 """ name
 
 dependencies = ["gm"]
