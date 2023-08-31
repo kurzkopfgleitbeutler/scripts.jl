@@ -21,7 +21,7 @@ $name [OPTIONS] [DIR | IMGS]
 """ name
 
 dependencies = ["gm"]
-optionals = ["okular", "tesseract"]
+optionals = ["okular", "tesseract", "gs"]
 
 mutable struct states
   demandoptionals::Bool
@@ -42,13 +42,53 @@ state = init(getflags([
   )
 ]))
 
+function stripfile(file::AbstractString)::IO
+  tmpio = IOBuffer()
+  open(file) do io
+    for line in eachline(io, keep=true)
+      if length(strip(line)) > 0
+        print(tmpio, line)
+      end
+    end
+  end
+  return tmpio
+end
+
 function converttopdf(files::Vector{String}, outfile::String)
   infiles = filter(endswith(r".png|.PNG"), filter(isfile, files))
   state.pdfname = string(outfile, ".pdf")
 
-  command = `gm convert -geometry 50% -strip -colors 6 $infiles $(state.pdfname)`
-  @debug command
-  run(command)
+  trim = []
+  if state.trim
+    trim = ["-fuzz", "80%", "-trim"]
+  end
+
+  if state.ocr
+    tmpocrfile = string(outfile, "_ocr")
+
+    p = pipeline(`gm convert $trim $infiles TIFF:-`, `tesseract - "$tmpocrfile" -l deu+eng quiet pdf hocr txt`)
+    @debug string("Generate files ", tmpocrfile, ".pdf, ", tmpocrfile, ".hocr, and ", tmpocrfile, ".txt") p
+    run(p)
+
+    @debug string("Remove empty lines from ", tmpocrfile, ".txt and write result to ", outfile, ".txt")
+    write(string(outfile, ".txt"), String(take!(stripfile(string(tmpocrfile, ".txt")))))
+    @debug string("Remove file ", tmpocrfile, ".txt")
+    rm("$(tmpocrfile).txt")
+
+    p2 = Cmd(`/usr/bin/gs -sDEVICE=pdfwrite -dPDFSETTINGS=/ebook -dSubsetFonts=true -dNOPAUSE -dBATCH -dQUIET -sOutputFile="$(outfile)_ocr2.pdf" "$(tmpocrfile).pdf"`)
+    @debug string("Route file ", outfile, ".pdf through ghostscript for optimization and write to ", tmpocrfile, "_ocr2.pdf") p2
+    run(p2)
+    @debug string("Remove file ", tmpocrfile, ".pdf")
+    rm("$(tmpocrfile).pdf")
+
+    @debug string("Rename ", outfile, "_ocr2.pdf to \"", state.pdfname, "\"")
+    mv("$(outfile)_ocr2.pdf", state.pdfname)
+
+  else
+    command = `gm convert -geometry 50% -strip -colors 6 $trim $infiles $(state.pdfname)`
+    @debug string("Convert images ", infiles, " to \"", state.pdfname, "\"") command
+    run(command)
+  end
 end
 
 function main()
