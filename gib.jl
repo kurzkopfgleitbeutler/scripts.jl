@@ -3,7 +3,7 @@ module gib
 include("util.jl")
 
 @doc """
-$name - easily share files between kdeconnect-enabled devices
+$name - send files via kdeconnect - easily share files between kdeconnect-enabled devices
 
 # Options
 
