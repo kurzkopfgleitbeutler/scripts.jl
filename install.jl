@@ -1,6 +1,7 @@
 #!/usr/bin/env julia
 module install
 using Base.Filesystem
+using Pkg
 
 name = nameof(@__MODULE__)
 @doc """
@@ -10,6 +11,11 @@ $name - install julia scripts on system
 
 $name [file names]
 """ name
+
+dependencies = ["LoggingExtras", "AnyAscii"]
+for dep in dependencies
+	Pkg.add(dep)
+end
 
 prefix = "/usr/local/bin/"
 if isempty(ARGS)
