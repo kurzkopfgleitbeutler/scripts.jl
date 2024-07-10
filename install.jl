@@ -14,12 +14,12 @@ $name [file names]
 
 dependencies = ["LoggingExtras", "AnyAscii"]
 for dep in dependencies
-	Pkg.add(dep)
+  Pkg.add(dep)
 end
 
 prefix = "/usr/local/bin/"
 if isempty(ARGS)
-  apps = ["gib.jl", "mkpdf.jl", "sfh.jl"]
+  apps = ["gib.jl", "mkpdf.jl", "sfh.jl", "scanpdf.jl"]
 else
   apps = ARGS
 end
