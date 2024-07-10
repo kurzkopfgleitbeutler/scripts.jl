@@ -23,7 +23,7 @@ $name [OPTIONS] [DIR | IMGS]
 """ name
 
 dependencies = ["gm"]
-optionals = ["okular", "tesseract", "gs"]
+optionals = ["org.kde.okular", "tesseract", "gs"]
 
 mutable struct states
   demandoptionals::Bool
@@ -130,9 +130,9 @@ function main()
     end
   end
 
-  if isfile(state.pdfname) & !isnothing(Sys.which("okular"))
+  if isfile(state.pdfname) & !isnothing(Sys.which("org.kde.okular"))
     @info "opening $(state.pdfname) in okular.."
-    run(`okular $(state.pdfname)`, wait=false)
+    run(`org.kde.okular $(state.pdfname)`, wait=false)
   end
 
 end
