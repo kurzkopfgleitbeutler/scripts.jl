@@ -53,16 +53,6 @@ function setscanner()
   end
 end
 
-function assert(message, condition, errormessage="wrong input, try again..")
-  println(message)
-  input = nothing
-  while !condition
-    println(errormessage)
-    input = readline()
-  end
-  return input
-end
-
 function anykey(message="press any key for next page..")
   println(message)
   setraw!(raw) = ccall(:jl_tty_set_mode, Int32, (Ptr{Cvoid}, Int32), stdin.handle, raw)
