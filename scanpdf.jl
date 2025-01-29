@@ -11,6 +11,13 @@ $name - scan from the command line
 - -v --verbose       Show on terminal what's happening during execution.
 - -l --log           Write log to file.
 
+## Paper Formats
+
+- -a4 -a4p --a4portrait		(default)
+- -a5 -a5l --a5landscape
+-     -a5p --a5portrait
+- -a6 -a6p --a6portrait
+
 # Usage
 
 $name [OPTIONS] [target device] filename [file names]

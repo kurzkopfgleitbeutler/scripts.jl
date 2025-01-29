@@ -13,6 +13,13 @@ $name - create PDF from PNG images
 - -t --trim          Trim page margins.
 - -o --ocr           Also produce OCR files.
 
+## Paper Formats
+
+- -a4 -a4p --a4portrait		(default)
+- -a5 -a5l --a5landscape
+-     -a5p --a5portrait
+- -a6 -a6p --a6portrait
+
 # Usage
 
 $name [OPTIONS] [DIR | IMGS]
