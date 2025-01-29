@@ -9,6 +9,18 @@ juliapackages::Vector{String} = ["LoggingExtras"]
 dependencies::Vector{String} = []
 optionals::Vector{String} = []
 
+struct paperFormat
+  height::Number
+  width::Number
+end
+
+# https://de.wikipedia.org/wiki/Papierformat#/media/Datei:A_size_illustration.svg
+#  with -2 millimetres for cleaner borders
+const a4portrait = paperFormat(295, 208)
+const a5portrait = paperFormat(208, 146)
+const a5landscape = paperFormat(146, 208)
+const a6portrait = paperFormat(146, 103)
+
 function getflags()
   return [
     (["?", "-?", "--?", "-h", "--help"],

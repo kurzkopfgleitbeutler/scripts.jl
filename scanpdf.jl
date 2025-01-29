@@ -27,13 +27,26 @@ mutable struct states
   loglvl::LogLevel
   logtofile::Bool
   scanner::String
+  format::paperFormat
   pages::Integer
   pdfname::String
-  states() = new(true, Logging.Warn, false, "", 1, "")
+  states() = new(true, Logging.Warn, false, "", a4portrait, 1, "")
 end
 
-# state = init(getflags([...]))
-state = init()
+state = init(getflags([
+  (["-a4", "-a4p", "--a4portrait"],
+    :(state.format = a4portrait)
+  ),
+  (["-a5p", "--a5portrait"],
+    :(state.format = a5portrait)
+  ),
+  (["-a5", "-a5l", "--a5landscape"],
+    :(state.format = a5landscape)
+  ),
+  (["-a6", "-a6p", "--a6portrait"],
+    :(state.format = a6portrait)
+  )
+]))
 
 # functions...
 function setscanner()
@@ -83,8 +96,8 @@ function main()
       --format=png \
       -l 2mm \
       -t 2mm \
-      -x 208 \
-      -y 295 \
+      -x $(state.format.width) \
+      -y $(state.format.height) \
       --mode Color \
       --resolution 300dpi \
       --output-file=$(state.pdfname)-$(i).png`

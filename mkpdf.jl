@@ -29,10 +29,11 @@ mutable struct states
   demandoptionals::Bool
   loglvl::LogLevel
   logtofile::Bool
+  format::paperFormat
   pdfname::String
   trim::Bool
   ocr::Bool
-  states() = new(true, Logging.Warn, false, "", false, false)
+  states() = new(true, Logging.Warn, false, a4portrait, "", false, false)
 end
 
 state = init(getflags([
@@ -41,6 +42,18 @@ state = init(getflags([
   ),
   (["-t", "--trim"],
     :(state.trim = true)
+  ),
+  (["-a4", "-a4p", "--a4portrait"],
+    :(state.format = a4portrait)
+  ),
+  (["-a5p", "--a5portrait"],
+    :(state.format = a5portrait)
+  ),
+  (["-a5", "-a5l", "--a5landscape"],
+    :(state.format = a5landscape)
+  ),
+  (["-a6", "-a6p", "--a6portrait"],
+    :(state.format = a6portrait)
   )
 ]))
 
@@ -65,10 +78,18 @@ function converttopdf(files::Vector{String}, outfile::String)
     trim = ["-fuzz", "80%", "-trim"]
   end
 
+  format = []
+  if state.format == a5landscape || state.format == a5portrait
+    # "-gravity", "NorthWest", "-density", "300x300", "-units", "PixelsPerInch",
+    format = ["-crop", string(trunc(Int, state.format.width / 25.4 * 300), "x", trunc(Int, state.format.height / 25.4 * 300))]
+  elseif state.format == a6portrait
+    format = ["-crop", string(trunc(Int, state.format.height / 25.4 * 300), "x", trunc(Int, state.format.width / 25.4 * 300))]
+  end
+
   if state.ocr
     tmpocrfile = string(outfile, "_ocr")
 
-    p = pipeline(`gm convert $trim $infiles TIFF:-`, `tesseract - "$tmpocrfile" -l deu+eng quiet pdf hocr txt`)
+    p = pipeline(`gm convert $format $trim $infiles TIFF:-`, `tesseract - "$tmpocrfile" -l deu+eng quiet pdf hocr txt`)
     @debug string("Generate files ", tmpocrfile, ".pdf, ", tmpocrfile, ".hocr, and ", tmpocrfile, ".txt") p
     run(p)
 
@@ -87,7 +108,7 @@ function converttopdf(files::Vector{String}, outfile::String)
     mv("$(outfile)_ocr2.pdf", state.pdfname)
 
   else
-    command = `gm convert -geometry 50% -strip -colors 6 $trim $infiles $(state.pdfname)`
+    command = `gm convert $format -geometry 50% -strip -colors 6 $trim $infiles $(state.pdfname)`
     @debug string("Convert images ", infiles, " to \"", state.pdfname, "\"") command
     run(command)
   end
